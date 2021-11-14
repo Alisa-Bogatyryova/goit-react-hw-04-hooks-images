@@ -4,7 +4,7 @@ import ImageGallery from './components/ImageGallery/ImageGallery';
 import Button from './components/Button/Button';
 import Loader from './components/Loader/Loader';
 import Modal from './components/Modal/Modal';
-import styles from '../App.module.css';
+import styles from './App.module.css';
 import * as imagesApi from './api/api';
 
 class App extends Component {
