@@ -1,10 +1,12 @@
-export const fetchImages = (query = '', pageNumber = 1) => {
-  return fetch(
-    `https://pixabay.com/api/?q=${query}&page=${pageNumber}&key=13128632-519e28f670cc6f8f58c4d9c9f&image_type=photo&orientation=horizontal&per_page=12`,
-  )
-    .then(x => new Promise(resolve => setTimeout(() => resolve(x), 1000))) // Задержка добавлена для тестирования Loader
-    .then(res => res.json())
-    .then(data => data.hits);
+import axios from 'axios';
+
+const apiKey = '4721358-13c427133c953f3e48d1d506d';
+const perPage = 12;
+const baseURL = `https://pixabay.com/api/?key=${apiKey}&image_type=photo&orientation=horizontal&per_page=${perPage}&q=`;
+
+const fetchImg = ({ query = '', currentPage = 1 }) => {
+  const url = `${baseURL}${query}&page=${currentPage}`;
+  return axios.get(url).then(({ data }) => data.hits);
 };
 
-export { fetchImages as default };
+export default fetchImg;

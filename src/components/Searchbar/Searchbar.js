@@ -1,43 +1,34 @@
-import React, { Component } from 'react';
-import styles from '../Searchbar/Searchbar.module.css';
+import { useState } from 'react';
+import s from './Searchbar.module.css';
 
-class Searchbar extends Component {
-  state = { search: '' };
+const Searchbar = ({ onSubmit }) => {
+  const [query, setQuery] = useState('');
 
-  handleChange = e => {
-    this.setState({ search: e.target.value });
-  };
-
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-
-    this.props.onSubmit(this.state.search);
-    this.setState({ search: '' });
+    onSubmit(query);
+    setQuery('');
   };
 
-  render() {
-    return (
-      <header className={styles.Searchbar}>
-        <form onSubmit={this.handleSubmit} className={styles.SearchForm}>
-          <button type="submit" className={styles.SearchFormButton}>
-            <span className={styles.SearchFormButtonLabel}>Search</span>
-          </button>
+  const handleChange = ({ currentTarget }) => {
+    setQuery(currentTarget.value);
+  };
 
-          <input
-            className={styles.SearchFormInput}
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            value={this.state.search}
-            name="search"
-            onChange={this.handleChange}
-          />
-        </form>
-      </header>
-    );
-  }
-}
-
+  return (
+    <header className={s.searchBar}>
+      <form onSubmit={handleSubmit}>
+        <button type="submit" className={s.searchFormButton}>
+          <span className={s.searchFormButtonLabel}> Search </span>
+        </button>
+        <input
+          className={s.searchFormInput}
+          type="text"
+          value={query}
+          onChange={handleChange}
+        />
+      </form>
+    </header>
+  );
+};
 
 export default Searchbar;

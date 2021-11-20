@@ -29,13 +29,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Alisa-Bogatyryova/goit-react-hw-03-image-finder"
+    "url": "git+https://github.com/Alisa-Bogatyryova/goit-react-hw-04-hooks-images"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/Alisa-Bogatyryova/goit-react-hw-03-image-finder.git/issues"
+    "url": "https://github.com/Alisa-Bogatyryova/goit-react-hw-04-hooks-images.git/issues"
   },
-  "homepage": "https://alisa-bogatyryova.github.io/goit-react-hw-03-image-finder",
+  "homepage": "https://alisa-bogatyryova.github.io/goit-react-hw-04-hooks-images/",
   "eslintConfig": {
     "extends": [
       "react-app",

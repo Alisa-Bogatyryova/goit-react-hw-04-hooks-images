@@ -1,111 +1,73 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
+import fetchImg from './api/api';
 import Searchbar from './components/Searchbar/Searchbar';
 import ImageGallery from './components/ImageGallery/ImageGallery';
-import Button from './components/Button/Button';
 import Loader from './components/Loader/Loader';
-import Modal from './components/Modal/Modal';
-import styles from './App.module.css';
-import * as imagesApi from './api/api';
+import Button from './components/Button/Button';
 
-class App extends Component {
-  static defaultProps = {};
 
-  static propTypes = {};
+const App = () => {
+  const [query, setQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  state = {
-    images: [],
-    pageNumber: 1,
-    search: '',
-    error: '',
-    isLoading: false,
-    isModalOpen: false,
-    largeImageId: null,
-    largeImage: [],
+  const fetchImages = () => {
+    const options = {
+      query,
+      currentPage,
+    };
+
+    setIsLoading(true);
+
+    fetchImg(options)
+      .then(
+        images => setImages(prevState => [...prevState, ...images]),
+        setCurrentPage(prevState => prevState + 1),
+      )
+      .catch(err => setError(err))
+      .finally(() => setIsLoading(false));
   };
 
-  componentDidMount() {}
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.search !== this.state.search) {
-      this.fetchImages(false);
+  useEffect(() => {
+    if (query) {
+      fetchImages();
     }
-  }
+    // eslint-disable-next-line
+  }, [query]);
 
-  onSearch = search => {
-    this.setState({ search, images: [], pageNumber: 1 });
-  };
-
-  fetchImagesWithScroll = () => {
-    this.fetchImages(true);
-  };
-
-  fetchImages = scroll => {
-    this.setState({ isLoading: true });
-    const { search, pageNumber } = this.state;
-    imagesApi
-      .fetchImages(search, pageNumber)
-      .then(images => {
-        this.setState(state => ({
-          images: [...state.images, ...images],
-          pageNumber: state.pageNumber + 1,
-        }));
-        return images[0];
-      })
-      .catch(error => {
-        this.setState({ error });
-      })
-      .finally(() => {
-        this.setState({ isLoading: false });
-      })
-      .then(firstLoadedImage => {
-        if (scroll) {
-          const { id } = firstLoadedImage;
-
-          const y =
-            document.getElementById(id).getBoundingClientRect().top +
-            window.scrollY -
-            80;
-          window.scrollTo({
-            top: y,
-            behavior: 'smooth',
-          });
-        }
-      });
-  };
-
-  findPic = () => {
-    const largeImg = this.state.images.find(image => {
-      return image.id === this.state.largeImageId;
+  useEffect(() => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth',
     });
-    return largeImg;
+  });
+
+  const handleSubmitSearchbar = query => {
+    setQuery(query);
+    setImages([]);
+    setCurrentPage(1);
+    setError(null);
   };
 
-  openModal = e => {
-    this.setState({
-      isModalOpen: true,
-      largeImageId: Number(e.currentTarget.id),
-    });
-  };
-  closeModal = () => this.setState({ isModalOpen: false });
-
-  render() {
-    const { isLoading, images, isModalOpen, largeImageId } = this.state;
-
-    return (
-      <div className={styles.App}>
-        <Searchbar onSubmit={this.onSearch} />
-        <ImageGallery openModal={this.openModal} images={images} />
-        {isLoading && <Loader />}
+  return (
+    <>
+      <Searchbar onSubmit={handleSubmitSearchbar} />
+      <ImageGallery
+        query={query}
+        images={images}
+        currentPage={currentPage}
+        error={error}
+        isLoading={isLoading}
+        fetchImages={fetchImages}
+      />
+      {isLoading && <Loader />}
         {images.length > 0 && (
-          <Button fetchImages={this.fetchImagesWithScroll} />
+          <Button fetchImages={fetchImages} />
         )}
-        {isModalOpen && (
-          <Modal largeImageId={largeImageId} onClose={this.closeModal}>
-            <img src={this.findPic().largeImageURL} alt={this.findPic().tags} />
-          </Modal>
-        )}
-      </div>
-    );
-  }
-}
+    </>
+  );
+};
 
 export default App;

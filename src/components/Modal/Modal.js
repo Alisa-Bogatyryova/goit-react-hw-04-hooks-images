@@ -1,59 +1,36 @@
-import React, { Component, createRef } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import PropTypes from 'prop-types';
+import s from './Modal.module.css';
 
-import styles from '../Modal/Modal.module.css';
+const modalRoot = document.querySelector('#modal-root');
 
-const MODAL_ROOT = document.querySelector('#modal-root');
+const Modal = ({ onCloseModal, children }) => {
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
 
-class Modal extends Component {
-  static propTypes = {
-    onClose: PropTypes.func.isRequired,
-    children: PropTypes.node.isRequired,
-  };
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  });
 
-  backdropRef = createRef();
-
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyPress);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyPress);
-  }
-
-  handleKeyPress = e => {
-    console.log(e);
-
-    if (e.code !== 'Escape') {
-      return;
+  const handleKeyDown = e => {
+    if (e.code === 'Escape') {
+      onCloseModal();
     }
-
-    this.props.onClose();
   };
 
-  handleBackdropClick = e => {
-    if (this.backdropRef.current && e.target !== this.backdropRef.current) {
-      return;
+  const handleBackdropClick = e => {
+    if (e.target === e.currentTarget) {
+      onCloseModal();
     }
-
-    this.props.onClose();
   };
 
-  render() {
-    const { children } = this.props;
-    return createPortal(
-      <div
-        className={styles.Overlay}
-        ref={this.backdropRef}
-        onClick={this.props.onClose}
-        role="presentation"
-      >
-        <div className={styles.Modal}>{children}</div>
-      </div>,
-      MODAL_ROOT,
-    );
-  }
-}
+  return createPortal(
+    <div className={s.backdrop} onClick={handleBackdropClick}>
+      <div className={s.modal}>{children}</div>
+    </div>,
+    modalRoot,
+  );
+};
 
 export default Modal;
